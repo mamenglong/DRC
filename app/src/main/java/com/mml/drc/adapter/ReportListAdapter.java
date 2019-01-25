@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mml.drc.Model.Report;
@@ -23,6 +24,7 @@ import java.util.List;
 public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.ReportListViewHolder>implements View.OnClickListener   {
     private Context mContext;
     private List<Report> list;
+    private OnItemClickListener itemClickListener;
     @NonNull
     @Override
     public ReportListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -46,6 +48,23 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
     public void onBindViewHolder(final ReportListViewHolder holder, final int position) {
         Log.e("adapter", "onBindViewHolder: "+position);
         Report report=list.get(position);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(itemClickListener!=null) {
+                    itemClickListener.onItemClick(list.get(position), position);
+                }
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(itemClickListener!=null) {
+                    itemClickListener.onLongItemClick(list.get(position), position);
+                }
+                return true;
+            }
+        });
         // todo pk
         holder.report_pk.setText("a");
         holder.report_no.setText("项目"+(position+1));
@@ -68,9 +87,20 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
         this.list = list;
     }
 
+    //点击事件接口
 
+    public interface OnItemClickListener{
+        void onItemClick(Report report, int position);
+        void onLongItemClick(Report report, int position);
+    }
+    //设置点击事件的方法
+
+    public void setItemClickListener(OnItemClickListener itemClickListener){
+        this.itemClickListener = itemClickListener;
+    }
     public class ReportListViewHolder extends RecyclerView.ViewHolder  {
         private TextView report_pk,report_no,report_date,report_status,report_opName;
+        private LinearLayout item_report;
         public ReportListViewHolder(View itemView) {
             super(itemView);
             report_pk=itemView.findViewById(R.id.report_pk);

@@ -52,7 +52,7 @@ public class BaseFragment extends Fragment {
     }
     public void bindData(View view,Boolean isSubmit){
         List<Report> reportList=new ArrayList<>();
-        //todo 区分状态
+        //todo 区分状态，litepal中对booolean用0或1
         if(isSubmit){
             //已提交
             reportList=LitePal.where("isSubmit=?","1").find(Report.class);
@@ -67,6 +67,18 @@ public class BaseFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator (new DefaultItemAnimator());
         ReportListAdapter adapter=new ReportListAdapter(reportList);
+        //TODO 点击事件监听
+        adapter.setItemClickListener(new ReportListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Report report, int position) {
+
+            }
+
+            @Override
+            public void onLongItemClick(Report report, int position) {
+
+            }
+        });
         LogUtils.d("提交状态："+isSubmit+":list数目:"+reportList.size());
         recyclerView.setAdapter(adapter);
     }
