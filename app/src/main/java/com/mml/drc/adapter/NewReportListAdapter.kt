@@ -28,6 +28,7 @@ import java.io.File
  * @author 11324
  * 2019/1/25
  */
+@Deprecated("")
 class NewReportListAdapter(context: Context, dataSet: MutableList<ReportItem>)
     : BaseListAdapter<NewReportItemHolder, ReportItem>(context, dataSet) {
 
@@ -89,6 +90,7 @@ fun ImageView.loadFile(filePath: String) {
             .load(File(filePath))
             .placeholder(R.drawable.ic_plus)
             .error(R.drawable.ic_error_black_24dp)
+            .centerCrop()
             .into(this)
 
 }

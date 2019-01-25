@@ -5,6 +5,7 @@ import org.litepal.crud.LitePalSupport;
 /**
  * Created by 11324 on 2019/1/25
  */
+@Deprecated
 public class ReportItem extends LitePalSupport {
     private Report report;
 
