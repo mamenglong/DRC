@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.MainActivity">
+    <!--title-->
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_100">
+        <TextView
+            android:gravity="center"
+            android:textSize="@dimen/dp_50"
+            android:id="@+id/main_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/main_title"/>
+        <Button
+            android:id="@+id/main_new_report"
+            android:layout_gravity="right"
+            android:textSize="@dimen/dp_30"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/main_new_report"/>
+    </android.support.design.widget.CoordinatorLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/title"
+        >
+        <android.support.v4.view.PagerTabStrip
+            android:id="@+id/pagertap"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dp_50"
+            android:layout_gravity="top"
+            android:textColor="@color/red" />
+    </android.support.v4.view.ViewPager>
+
+</RelativeLayout>
