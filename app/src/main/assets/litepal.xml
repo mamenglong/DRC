@@ -33,6 +33,7 @@
     -->
     <list>
         <mapping class="com.mml.drc.Model.User"></mapping>
+        <mapping class="com.mml.drc.Model.Report"/>
     </list>
 
     <!--
