@@ -60,8 +60,8 @@ public class MainActivity extends BaseActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(BaseFragment.newInstance("未提交"));
-        adapter.addFragment(BaseFragment.newInstance("已提交"));
+        adapter.addFragment(BaseFragment.newInstance(false));
+        adapter.addFragment(BaseFragment.newInstance(true));
         adapter.addTitle("未提交");
         adapter.addTitle("已提交");
         viewPager.setAdapter(adapter);
