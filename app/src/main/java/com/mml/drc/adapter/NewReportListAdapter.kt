@@ -1,13 +1,16 @@
 package com.mml.drc.adapter
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.mml.drc.Model.ReportItem
 import com.mml.drc.R
@@ -25,24 +28,32 @@ import java.io.File
  * @author 11324
  * 2019/1/25
  */
-class NewReportListAdapter(context: Context, dataSet: List<ReportItem>?)
+class NewReportListAdapter(context: Context, dataSet: MutableList<ReportItem>)
     : BaseListAdapter<NewReportItemHolder, ReportItem>(context, dataSet) {
 
     override fun onCreateViewHolder(view: View): NewReportItemHolder = NewReportItemHolder(view)
 
     override fun layoutId(position: Int): Int = R.layout.item_new_report
 
+    @SuppressLint("SetTextI18n")
     override fun onBindView(holder: NewReportItemHolder, pos: Int, item: ReportItem) {
         item.imagePath?.apply {
             //加载图片
             holder.imageView.loadFile(this)
+        } ?: let {
+            holder.imageView.setImageResource(R.drawable.ic_plus)
         }
+        holder.noView.text = "数据${pos + 1}"
         item.measurementValue?.apply {
             holder.measureView.setText(this.toString())
         }
-        holder.measureView.addTextChangedListener(object:TextWatcher {
+        holder.measureView.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                item.measurementValue = try { s?.toString()?.toDouble() } catch (e:Throwable){ null }
+                item.measurementValue = try {
+                    s?.toString()?.toDouble()
+                } catch (e: Throwable) {
+                    null
+                }
                 Log.d("Debug :", "afterTextChanged  ----> ${item.measurementValue}")
             }
 
@@ -52,6 +63,9 @@ class NewReportListAdapter(context: Context, dataSet: List<ReportItem>?)
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
+        holder.delBtn.setOnClickListener {
+            removeAt(pos)
+        }
         holder.imageView.setOnClickListener {
             //选择图片
 //            FilePickerBuilder.instance.setMaxCount(1)
@@ -80,6 +94,8 @@ fun ImageView.loadFile(filePath: String) {
 }
 
 class NewReportItemHolder(itemView: View) : BaseListAdapter.ViewHolder(itemView) {
+    val noView = itemView.findViewById<TextView>(R.id.no)
     val imageView = itemView.findViewById<ImageView>(R.id.image_view)
     val measureView = itemView.findViewById<EditText>(R.id.measure_value_view)
+    val delBtn = itemView.findViewById<Button>(R.id.delete_btn)
 }

@@ -13,7 +13,7 @@ import android.widget.BaseAdapter
  */
 
 abstract class BaseListAdapter<VH : BaseListAdapter.ViewHolder, DataType>(
-        internal var context: Context, private val dataSet: List<DataType>?) : BaseAdapter() {
+        internal var context: Context, private val dataSet: MutableList<DataType>) : BaseAdapter() {
     var inflater: LayoutInflater = LayoutInflater.from(context)
 
     protected abstract fun onCreateViewHolder(view: View): VH
@@ -28,7 +28,7 @@ abstract class BaseListAdapter<VH : BaseListAdapter.ViewHolder, DataType>(
      */
     protected abstract fun onBindView(holder: VH, pos: Int, item: DataType)
 
-    override fun getItem(position: Int): DataType = dataSet!![position]
+    override fun getItem(position: Int): DataType = dataSet[position]
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var view = convertView
@@ -47,6 +47,10 @@ abstract class BaseListAdapter<VH : BaseListAdapter.ViewHolder, DataType>(
         return position.toLong()
     }
 
+    fun removeAt(pos: Int) {
+        dataSet.removeAt(pos)
+        notifyDataSetChanged()
+    }
     abstract class ViewHolder(val itemView: View)
 
 }
