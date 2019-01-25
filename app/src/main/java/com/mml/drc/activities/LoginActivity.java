@@ -28,6 +28,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -169,12 +170,12 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 startActivity(register);
             }
         });
-        mRemmber.setOnClickListener(new OnClickListener() {
+        mRemmber.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                if(mRemmber.isChecked()) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
                     SPUtils.getInstance().put("remmber",true);
-                } else {
+                }else {
                     SPUtils.getInstance().put("remmber",false);
                 }
             }
@@ -183,6 +184,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
             @Override
             public void onClick(View v) {
                 if(mAutoLogin.isChecked()) {
+                    mRemmber.setChecked(true);
                     SPUtils.getInstance().put("autoLogin",true);
                 } else {
                     SPUtils.getInstance().put("autoLogin",false);
@@ -470,8 +472,9 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                             user.save();
                             Result=1;
                         }
-                        else
+                        else {
                             Result=0;
+                        }
                     }
                 }
                 else {
