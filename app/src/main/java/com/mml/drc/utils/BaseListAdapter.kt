@@ -1,6 +1,7 @@
 package com.mml.drc.utils
 
 import android.content.Context
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,7 @@ import android.widget.BaseAdapter
  */
 
 abstract class BaseListAdapter<VH : BaseListAdapter.ViewHolder, DataType>(
-        internal var context: Context, private val dataSet: MutableList<DataType>) : BaseAdapter() {
+        internal var context: Context,val dataSet: MutableList<DataType>) : BaseAdapter() {
     var inflater: LayoutInflater = LayoutInflater.from(context)
 
     protected abstract fun onCreateViewHolder(view: View): VH
@@ -33,6 +34,7 @@ abstract class BaseListAdapter<VH : BaseListAdapter.ViewHolder, DataType>(
 
     override fun getItem(position: Int): DataType = dataSet[position]
 
+    val holders = SparseArray<VH>()
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var view = convertView
         val holder: VH
@@ -41,7 +43,7 @@ abstract class BaseListAdapter<VH : BaseListAdapter.ViewHolder, DataType>(
             holder = onCreateViewHolder(view)
             view.tag = holder
         } else holder = view.tag as VH
-
+        holders.put(position, holder)
         onBindView(holder, position, getItem(position))
         return view
     }

@@ -10,13 +10,10 @@ import android.util.Log
 import android.view.View
 import com.mml.drc.Model.Report
 import com.mml.drc.R
-import com.mml.drc.adapter.GridAdapter
 import com.mml.drc.adapter.MeasureTextAdapter
+import com.mml.drc.adapter.ReportImageGridAdapter
 import com.mml.drc.utils.toastLong
 import com.zhihu.matisse.Matisse
-import com.zhihu.matisse.MimeType
-import com.zhihu.matisse.engine.impl.GlideEngine
-import com.zhihu.matisse.internal.entity.CaptureStrategy
 import kotlinx.android.synthetic.main.activity_new_report.*
 import org.litepal.LitePal
 import java.util.*
@@ -24,7 +21,7 @@ import java.util.*
 class NewReportActivity : AppCompatActivity() {
 
     private lateinit var report: Report//TODO 操作员
-    private val gridAdapter by lazy { GridAdapter(this, report.photoPaths) }
+    private val gridAdapter by lazy { ReportImageGridAdapter(this, report.photoPaths) }
     private val measureAdapter by lazy { MeasureTextAdapter(this, report.measurementValue) }
 
 
@@ -33,16 +30,24 @@ class NewReportActivity : AppCompatActivity() {
         const val REQUEST_CODE_CHOOSE_PHOYO = 1000
     }
 
+    private fun disableView() {//浏览模式
+        action_layout.visibility = View.GONE
+        gridAdapter.disableAll()
+        measureAdapter.disableAll()
+    }
+
     var id: Long = ERR_ID
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_report)
 
         id = intent?.getLongExtra("id", ERR_ID) ?: ERR_ID
+        //实例化Report
         try {
             report = if (id != ERR_ID) {//编辑
                 LitePal.find(Report::class.java, id)
             } else Report()
+            report.fill() // 填数据
         } catch (e: Throwable) {//新建
             e.printStackTrace()
             toastLong("程序错误")
@@ -52,7 +57,11 @@ class NewReportActivity : AppCompatActivity() {
         requestPermission()
         measure_list_view.adapter = measureAdapter
         report_photo_grid.adapter = gridAdapter
-        report_photo_grid.numColumns = 3
+        report_photo_grid.numColumns = 1
+        if (id != ERR_ID && report.submit)
+            Handler().postDelayed({
+                disableView()
+            }, 1000)
 
         val s = LitePal.findAll(Report::class.java)
         Log.d("Debug :", "onCreate 报告数量 ----> ${s.size}")
@@ -77,7 +86,7 @@ class NewReportActivity : AppCompatActivity() {
             report.save()
         } else {
             Log.d("Debug :", "saveOrUpdate  ----> 更新")
-            report.update(id)//更新
+            report.update()//更新
         }
         toastLong("保存完成")
 
@@ -91,31 +100,27 @@ class NewReportActivity : AppCompatActivity() {
         when (view.id) {
             R.id.save_new_report -> {
                 report.date = Date()
+                if (report.submit) {
+                    toastLong("已经提交，无法保存")
+                    return
+
+                }
                 saveOrUpdate()
                 finish()
             }
-            R.id.sel_photo -> {
-                Matisse.from(this)
-                        .choose(MimeType.ofImage())//图片类型
-                        .countable(true)//true:选中后显示数字;false:选中后显示对号
-                        .maxSelectable(10)//可选的最大数
-                        .capture(true)//选择照片时，是否显示拍照
-                        .captureStrategy(CaptureStrategy(true, "$packageName.fileprovider"))//参数1 true表示拍照存储在共有目录，false表示存储在私有目录；参数2与 AndroidManifest中authorities值相同，用于适配7.0系统 必须设置
-                        .imageEngine(GlideEngine())//图片加载引擎
-                        .forResult(REQUEST_CODE_CHOOSE_PHOYO)//
-            }
+
             R.id.submit_new_report -> {
                 report.date ?: let { report.date = Date() }
                 if (report.submit) {
-                    toastLong("已经提交")
+                    toastLong("已经提交，无法再次提交")
                     return
                 }
                 submitReport()
             }
-            R.id.add_measure -> {
-                report.measurementValue.add(0.0)
-                measureAdapter.notifyDataSetChanged()
-            }
+//            R.id.add_measure -> {
+//                report.measurementValue.add("")
+//                measureAdapter.notifyDataSetChanged()
+//            }
         }
     }
 
@@ -144,7 +149,7 @@ class NewReportActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode != RESULT_OK) return
-        if (requestCode == REQUEST_CODE_CHOOSE_PHOYO) {//选取图片
+        if (requestCode > 999) {//选取图片
             val paths = Matisse.obtainPathResult(data)
             if (paths == null) {
                 toastLong("选择失败")
@@ -152,14 +157,8 @@ class NewReportActivity : AppCompatActivity() {
             }
             if (paths.isEmpty()) return
 
-            try {
-                report.photoPaths.clear()
-                report.photoPaths.addAll(paths)
-                Log.d("Debug :", "onActivityResult  ----> $paths")
-            } catch (e: Exception) {
-                e.printStackTrace()
-                toastLong("选择失败 ${e.message}")
-            }
+            val pos = requestCode - 1000
+            report.photoPaths[pos] = paths[0]
             gridAdapter.notifyDataSetChanged()//显示图片
         }
     }
