@@ -60,4 +60,7 @@ public class Report extends LitePalSupport {
     public void setSubmit(Boolean submit) {
         isSubmit = submit;
     }
+    public long getPKId(){
+        return getBaseObjId();
+    }
 }

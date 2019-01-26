@@ -14,6 +14,7 @@ import com.mml.drc.Model.Report;
 import com.mml.drc.R;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,9 +22,9 @@ import java.util.List;
  * Created by Long on 2018/4/3.
  * 修改时间：2018/4/3 19:01
  */
-public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.ReportListViewHolder>implements View.OnClickListener   {
+public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.ReportListViewHolder>   {
     private Context mContext;
-    private List<Report> list;
+    private List<Report> list=new ArrayList<>();
     private OnItemClickListener itemClickListener;
     @NonNull
     @Override
@@ -32,7 +33,6 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
             mContext = parent.getContext();
         }
         View view = LayoutInflater.from(mContext).inflate(R.layout.item_activity_main_fragment, parent, false);
-        view.setOnClickListener(this);
         ReportListViewHolder holder = new ReportListViewHolder(view);
         return holder;
     }
@@ -52,7 +52,7 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
             @Override
             public void onClick(View v) {
                 if(itemClickListener!=null) {
-                    itemClickListener.onItemClick(list.get(position), position);
+                    itemClickListener.onItemClick(v,list.get(position), position);
                 }
             }
         });
@@ -60,28 +60,29 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
             @Override
             public boolean onLongClick(View v) {
                 if(itemClickListener!=null) {
-                    itemClickListener.onLongItemClick(list.get(position), position);
+                    itemClickListener.onLongItemClick(v,list.get(position), position);
                 }
                 return true;
             }
         });
         // todo pk
-        holder.report_pk.setText("a");
+        holder.report_pk.setText(String.valueOf(report.getPKId()));
         holder.report_no.setText("项目"+(position+1));
         holder.report_date.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(report.getDate()));
-        holder.report_status.setText(report.getSubmit().toString());
-        holder.report_opName.setText(report.getOpName());
+        if (report.getSubmit()) {
+            holder.report_status.setTextColor(mContext.getResources().getColor(R.color.green));
+            holder.report_status.setText("已提交");
+        }else{
+            holder.report_status.setTextColor(mContext.getResources().getColor(R.color.green));
+            holder.report_status.setText("未提交");
+        }
+        holder.report_opName.setText(report.getOpName()==null?"操作员":report.getOpName());
     }
 
     @Override
     public int getItemCount() {
         return list.size();
     }
-
-    @Override
-    public void onClick(View v) {
-    }
-
 
     public ReportListAdapter(List<Report> list) {
         this.list = list;
@@ -90,8 +91,8 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
     //点击事件接口
 
     public interface OnItemClickListener{
-        void onItemClick(Report report, int position);
-        void onLongItemClick(Report report, int position);
+        void onItemClick(View view,Report report, int position);
+        void onLongItemClick(View view,Report report, int position);
     }
     //设置点击事件的方法
 
