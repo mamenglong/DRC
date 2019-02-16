@@ -28,6 +28,7 @@ import com.mml.drc.adapter.ReportListAdapter;
 import com.mml.drc.application.MyApplication;
 import com.mml.drc.utils.LogUtils;
 
+import org.jetbrains.annotations.NotNull;
 import org.litepal.LitePal;
 
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * @author Long
+ */
 public class BaseFragment extends Fragment {
     @BindView(R.id.refresh_layout)
     SwipeRefreshLayout refresh_layout;
@@ -64,9 +68,10 @@ public class BaseFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_main_fragment, container,false);
-        isSubmit= getArguments().getBoolean("isSubmit");
+        assert getArguments() != null;
+        isSubmit = getArguments().getBoolean("isSubmit");
         ButterKnife.bind(this, view);
         initView();
         bindData();

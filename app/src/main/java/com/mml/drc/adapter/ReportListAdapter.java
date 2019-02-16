@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.mml.drc.Model.Report;
 import com.mml.drc.R;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,7 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
     private OnItemClickListener itemClickListener;
     @NonNull
     @Override
-    public ReportListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ReportListViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (mContext == null) {
             mContext = parent.getContext();
         }
@@ -91,15 +93,29 @@ public class ReportListAdapter extends  RecyclerView.Adapter<ReportListAdapter.R
     //点击事件接口
 
     public interface OnItemClickListener{
+        /**
+         * @param view
+         * @param report
+         * @param position
+         * 实现点击
+         */
         void onItemClick(View view,Report report, int position);
+
+        /**
+         * @param view
+         * @param report
+         * @param position
+         * 实现长点击
+         */
         void onLongItemClick(View view,Report report, int position);
     }
+
     //设置点击事件的方法
 
     public void setItemClickListener(OnItemClickListener itemClickListener){
         this.itemClickListener = itemClickListener;
     }
-    public class ReportListViewHolder extends RecyclerView.ViewHolder  {
+    class ReportListViewHolder extends RecyclerView.ViewHolder  {
         private TextView report_pk,report_no,report_date,report_status,report_opName;
         private LinearLayout item_report;
         public ReportListViewHolder(View itemView) {
