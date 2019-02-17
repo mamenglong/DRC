@@ -1,5 +1,6 @@
 package com.mml.drc.activities
 
+import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
@@ -18,7 +19,6 @@ import com.mml.drc.utils.*
 import com.zhihu.matisse.Matisse
 import kotlinx.android.synthetic.main.activity_new_report.*
 import org.litepal.LitePal
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.thread
 
@@ -71,6 +71,20 @@ class NewReportActivity : AppCompatActivity() {
         Log.d("Debug :", "onCreate 报告数量 ----> ${s.size}")
     }
 
+    override fun onBackPressed() {
+        AlertDialog.Builder(this).apply {
+            setTitle("确认退出?")
+            setMessage("内容将不会被保存")
+            setPositiveButton("取消") { d, _ ->
+                d.dismiss()
+            }
+            setNegativeButton("确认") { d, _ ->
+                d.dismiss()
+                super.onBackPressed()
+            }
+            show()
+        }
+    }
 
     private fun requestPermission() {
         ActivityCompat.requestPermissions(this, arrayOf(
