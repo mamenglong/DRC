@@ -33,7 +33,7 @@ dependencies {
     //litepal数据库
     implementation 'org.litepal.android:java:3.0.0'
     implementation 'com.android.support:design:28.0.0'
-
+    implementation 'top.zibin:Luban:1.1.8'//鲁班 压缩图片
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     //注解绑定控件
     implementation 'com.jakewharton:butterknife:9.0.0-rc1'

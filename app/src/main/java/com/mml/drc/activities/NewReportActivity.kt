@@ -1,5 +1,6 @@
 package com.mml.drc.activities
 
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
@@ -8,15 +9,18 @@ import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import com.mml.drc.Model.BaseResponse
 import com.mml.drc.Model.Report
 import com.mml.drc.R
 import com.mml.drc.adapter.MeasureTextAdapter
 import com.mml.drc.adapter.ReportImageGridAdapter
-import com.mml.drc.utils.toastLong
+import com.mml.drc.utils.*
 import com.zhihu.matisse.Matisse
 import kotlinx.android.synthetic.main.activity_new_report.*
 import org.litepal.LitePal
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.thread
 
 class NewReportActivity : AppCompatActivity() {
 
@@ -115,6 +119,10 @@ class NewReportActivity : AppCompatActivity() {
                     toastLong("已经提交，无法再次提交")
                     return
                 }
+                if (report.isEmpty) {
+                    toastShort("填写数据")
+                    return
+                }
                 submitReport()
             }
 //            R.id.add_measure -> {
@@ -127,24 +135,50 @@ class NewReportActivity : AppCompatActivity() {
     /**
      * 提交报告
      */
+    var d: Dialog? = null
+
     private fun submitReport() {
-        //TODO 检查网络 -> 上传
-        ProgressDialog(this).apply {
+        if (!isNetworkAvailable(this)) {
+            toastShort("网络不可用,请先保存")
+            return
+        }
+
+
+        d = ProgressDialog(this).apply {
             setTitle("正在提交...")
             show()
-            Handler().postDelayed({
-                dismiss()
-            }, 2000L)
-            setOnDismissListener {
-                //模拟提交成功
-
-                report.submit = true
-                saveOrUpdate()
-                toastLong("提交完成")
-                finish()
+            thread {
+                doSubmit()
             }
         }
 
+    }
+
+    private fun doSubmit() {
+        //压缩图片
+        val fs = compassImages(this, report.photoPaths.filter { it != null })
+        NetHelper.postFile<BaseResponse>(Urls.INSERT_REPORT, report, files = fs) {
+            success { _, responseModel ->
+                Log.d("Debug :", "doSubmit  ----> $responseModel")
+                if (responseModel.status == 1) {
+                    onSubmitSuccess()
+                } else {
+                    toastShort(responseModel.msg ?: "未知错误")
+                }
+                d?.dismiss()
+            }
+            fail { _, e ->
+                toastShort(e.message ?: "未知错误")
+                d?.dismiss()
+            }
+        }
+    }
+
+    private fun onSubmitSuccess() {
+        report.submit = true
+        saveOrUpdate()
+        toastLong("提交成功")
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

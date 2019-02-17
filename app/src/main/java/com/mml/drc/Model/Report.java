@@ -1,5 +1,7 @@
 package com.mml.drc.Model;
 
+import com.google.gson.annotations.Expose;
+
 import org.litepal.crud.LitePalSupport;
 
 import java.util.ArrayList;
@@ -11,16 +13,27 @@ import java.util.List;
  * Created by 11324 on 2019/1/25
  */
 public class Report extends LitePalSupport {
-    public static final int MAX_=0;
+    public static final int MAX_ = 0;
 
     private Date date;//日期
 
     private String opName;//操作员
     //private List<ReportItem> reportItems = new ArrayList<>(); //测量值 图片路径
+    @Expose(serialize = false)
     private Boolean isSubmit = false; //是否提交至云端
 
+    @Expose(serialize = false)
     private List<String> photoPaths = new ArrayList<>();
     private List<String> measurementValue = new ArrayList<>();
+
+    public boolean isEmpty() {
+        for (List<String> l : new List[]{photoPaths, measurementValue}) {
+            for (String s : l) {
+                if (s != null && s.length() > 0) return false;
+            }
+        }
+        return true;
+    }
 
     public Report() {
     }
