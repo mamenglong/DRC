@@ -109,8 +109,9 @@ public class NetUtil {
             NetworkInfo.State state = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState();
             if (NetworkInfo.State.CONNECTED == state)
                 return true;
-            else
+            else {
                 return false;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;

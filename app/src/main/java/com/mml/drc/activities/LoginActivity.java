@@ -37,6 +37,7 @@ import com.mml.drc.Model.User;
 import com.mml.drc.R;
 import com.mml.drc.application.MyApplication;
 import com.mml.drc.retrofit_interface.UserResult;
+import com.mml.drc.utils.DeviceUtil;
 import com.mml.drc.utils.LogUtils;
 import com.mml.drc.utils.SPUtils;
 
@@ -119,6 +120,11 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         }
     }
 
+    /**
+     * 调用禁用menu
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return false;
@@ -166,7 +172,7 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
         register.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent register=new Intent(LoginActivity.this,LoginActivity.class);
+                Intent register=new Intent(LoginActivity.this,RegisterActivity.class);
                 startActivity(register);
             }
         });
@@ -449,31 +455,29 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                 User user=new User();
                 user.setUserName(mEmail);
                 user.setPassWord(mPassword);
-                if(!LitePal.isExist(User.class,"userName=? and passWord=?",user.getUserName(),user.getPassWord()))
-                {
+                user.setUniqueCode(DeviceUtil.getUniqueId(LoginActivity.this));
+                if(!LitePal.isExist(User.class,"userName=? and passWord=? and uniqueCode=?",user.getUserName(),user.getPassWord(),user.getUniqueCode())) {
                     //todo  服务器端返回 true false
                     Retrofit retrofit = new Retrofit.Builder()
                             .addConverterFactory(GsonConverterFactory.create())
                             .baseUrl(getResources().getString(R.string.baseURL))
                             .client(getOkHttpClient())
                             .build();
-                    UserResult.UserInterface request=retrofit.create(UserResult.UserInterface.class);
+                    UserResult.UserLoginInterface request=retrofit.create(UserResult.UserLoginInterface.class);
 
-                    Call<UserResult> call= request.getCall(user.getUserName(),user.getPassWord());
+                    Call<UserResult> call= request.getCall(user.getUserName(),user.getPassWord(),user.getUniqueCode());
 
                     Response<UserResult> response=call.execute();
 
-                    if(response.isSuccessful())
-                    {
+                    if(response.isSuccessful()) {
                         LogUtils.i(response.body().toString());
-                        Toast.makeText(LoginActivity.this,response.body().toString(),Toast.LENGTH_SHORT).show();
-                        if(response.body().isResult()&&response.body().isExist())
+                        if(response.body().getStatus()==1)
                         {
                             user.save();
                             Result=1;
-                        }
-                        else {
-                            Result=0;
+                        }else {
+                            Result=2;
+                            LogUtils.i("登陆失败",response.body().getMsg());
                         }
                     }
                 }
@@ -481,28 +485,28 @@ public class LoginActivity extends BaseActivity implements LoaderCallbacks<Curso
                     Result=1;
                 }
             } catch (Exception e) {
-                Result =2;
+                Result =3;
                 LogUtils.i("Exception",e.toString());
 
             }
             finally {
                 return  Result;
-            }//0不存在或用户名密码错误 1存在 2异常
+            }// 1存在 2用户名密码错误 3异常
 
         }
 
         @Override
         protected void onPostExecute(final Integer success) {
-            //0网络端不存在用户 1默认本地存在 2本地不存在网络端存在 3网络请求失败
+            // 1账户密码设备id确认成功，2失败 3网络请求失败
             mAuthTask = null;
             showProgress(false);
-            if (success==1||success==2) {
+            if (success==1) {
                 Toast.makeText(LoginActivity.this,"登陆成功！",Toast.LENGTH_SHORT).show();
                 Intent intent=new Intent(LoginActivity.this,MainActivity.class);
                 finish();
                 startActivity(intent);
-            } else if(success==0){
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
+            } else if(success==2){
+                mPasswordView.setError(getString(R.string.error_login_fail));
                 mPasswordView.requestFocus();
             }
             else {

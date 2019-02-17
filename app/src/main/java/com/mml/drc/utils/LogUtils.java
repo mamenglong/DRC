@@ -16,7 +16,7 @@ public class LogUtils {
 	public static final int WARN = 4;
 	public static final int ERROR = 5;
 	public static final int NOTHING = 6;
-	public static final int LEVEL = INFO;
+	public static final int LEVEL = VERBOSE;
 	public static final String SEPARATOR = ",";
 
 	public static void v(String message) {
@@ -123,9 +123,8 @@ public class LogUtils {
 	 */
 	public static String getDefaultTag(StackTraceElement stackTraceElement) {
 		String fileName = stackTraceElement.getFileName();
-		String stringArray[] = fileName.split("\\.");
-		String tag = stringArray[0];
-		return tag;
+		String[] stringArray = fileName.split("\\.");
+		return stringArray[0];
 	}
 
 	/**

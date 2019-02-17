@@ -10,6 +10,7 @@ import org.litepal.crud.LitePalSupport;
 public class User extends LitePalSupport {
     private String userName;
     private String passWord;
+    private String uniqueCode;
 
     public String getUserName() {
         return userName;
@@ -25,5 +26,13 @@ public class User extends LitePalSupport {
 
     public void setPassWord(String passWord) {
         this.passWord = passWord;
+    }
+
+    public String getUniqueCode() {
+        return uniqueCode;
+    }
+
+    public void setUniqueCode(String uniqueCode) {
+        this.uniqueCode = uniqueCode;
     }
 }

@@ -2,6 +2,7 @@ package com.mml.drc.retrofit_interface;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 /**
@@ -11,29 +12,75 @@ import retrofit2.http.Query;
  */
 
 public class UserResult {
-    public boolean isResult() {
-        return result;
+    private int status;//状态0失败，1成功
+    private String msg;//说明
+    private String exception;//异常
+    private String timestamp;//时间
+
+    public String getTimestamp() {
+        return timestamp;
     }
 
-    public void setResult(boolean result) {
-        this.result = result;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
-    private boolean result;
-    private boolean isExist;
-
-    public boolean isExist() {
-        return isExist;
+    public String getException() {
+        return exception;
     }
 
-    public void setExist(boolean exists) {
-        isExist = exists;
+    public void setException(String exception) {
+        this.exception = exception;
     }
 
-    public interface UserInterface {
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    @Deprecated
+    public interface UserInterface1 {
         //@GET("Users/GetHasUser?userName={name}&pwd={pw}")
         @GET("Users/GetHasUser")
         Call<UserResult> getCall(@Query("userName") String name, @Query("pwd") String pw);
+        // 注解里传入 网络请求 的部分URL地址
+        // Retrofit把网络请求的URL分成了两部分：一部分放在Retrofit对象里，另一部分放在网络请求接口里
+        // 如果接口里的url是一个完整的网址，那么放在Retrofit对象里的URL可以忽略
+        // getCall()是接受网络请求数据的方法
+
+    }
+    public interface UserLoginInterface {
+        @POST("login")
+        Call<UserResult> getCall(@Query("userName") String name, @Query("passWord") String pw,@Query("uniqueCode") String uniqueCode);
+        // 注解里传入 网络请求 的部分URL地址
+        // Retrofit把网络请求的URL分成了两部分：一部分放在Retrofit对象里，另一部分放在网络请求接口里
+        // 如果接口里的url是一个完整的网址，那么放在Retrofit对象里的URL可以忽略
+        // getCall()是接受网络请求数据的方法
+
+    }
+    public interface UserRegisterInterface {
+        @POST("register")
+        Call<UserResult> getCall(@Query("userName") String name, @Query("passWord") String pw,@Query("uniqueCode") String uniqueCode);
+        // 注解里传入 网络请求 的部分URL地址
+        // Retrofit把网络请求的URL分成了两部分：一部分放在Retrofit对象里，另一部分放在网络请求接口里
+        // 如果接口里的url是一个完整的网址，那么放在Retrofit对象里的URL可以忽略
+        // getCall()是接受网络请求数据的方法
+
+    }
+    public interface UserRegisterUsernameCheckInterface {
+        @POST("isUsernameExist")
+        Call<UserResult> getCall(@Query("userName") String name);
         // 注解里传入 网络请求 的部分URL地址
         // Retrofit把网络请求的URL分成了两部分：一部分放在Retrofit对象里，另一部分放在网络请求接口里
         // 如果接口里的url是一个完整的网址，那么放在Retrofit对象里的URL可以忽略
